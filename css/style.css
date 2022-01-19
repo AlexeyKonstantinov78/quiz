@@ -207,11 +207,58 @@ button {
 }
 
 .answer {
-
+    position: relative;
+    display: block;
+    margin-bottom: 26px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 40px;
+    padding-left: 65px;
 }
 
 .answer__checkbox {
-
+    position: absolute;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 40px;
+    height: 40px;
+    margin: 0 0 0 -65px;
 }
 
+.answer__checkbox:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 40px;
+    height: 40px;
+    background-color: #fff;    
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+}
 
+.answer__checkbox:after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: 12px;
+    height: 8px;
+    width: 17px;
+    border: 2px solid #434343;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+    opacity: 0;
+    transition: opacity .34s ease;
+}
+
+.answer__checkbox:checked:after {
+    opacity: 1;
+}
+
+.answer__checkbox:focus:before, 
+.answer__checkbox:hover:before {
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+}
