@@ -113,6 +113,8 @@ button {
     border: none;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    display: block;
+    margin: 0 auto;
 }
 
 .selection {
@@ -184,7 +186,32 @@ button {
     color: #8C8C8C;
 }
 
+.main__box_question {
+    padding: 60px 120px;
+    height: auto;
+    min-height: 540px;
+}
 
+.main__form-question {
+    position: relative;
+}
 
+.main__form-question:after {
+    position: absolute;
+    content: attr(data-count);
+    bottom: 0;
+    right: 0;
+    font-weight: 300;
+    font-size: 18px;
+    color: #8C8C8C;
+}
+
+.answer {
+
+}
+
+.answer__checkbox {
+
+}
 
 
