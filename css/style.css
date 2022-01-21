@@ -50,6 +50,11 @@ button {
     cursor: pointer;
 }
 
+a {
+    text-decoration: none;    
+    cursor: pointer;
+}
+
 .header {
     background-color: #296C82;    
     padding: 13px 0;    
