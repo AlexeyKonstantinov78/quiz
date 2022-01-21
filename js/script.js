@@ -5,110 +5,28 @@ const main = document.querySelector('.main'),
     title = document.querySelector('.main__title');
 
 const getData = () => {
-    const dataBase = [
-        {
-            id: '01',
-            theme: 'Тема01 тест',
-            rezult: [
-                [40, 'Есть задатки, нужно развиваться'],
-                [80, 'Очень хорошо, но есть пробелы'],
-                [100, 'Отличный результат'],
-            ],
-            list: [
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'неправильный'],
-                    correct: 2,
-                },
-                {
-                    type: 'radio',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'неПравильный1', 'неправильный', 'неправильный'],                    
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'неправильный', 'неправильный'],
-                    correct: 2,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'неправильный', 'неправильный'],
-                    correct: 2,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'правильный', 'неправильный'],
-                    correct: 3,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'неПравильный1', 'неправильный', 'неправильный'],
-                    correct: 1,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'неправильный', 'неправильный'],
-                    correct: 2,
-                }
-            ]
-        },
-        {
-            id: '02',
-            theme: 'Тема02 тесттоже',
-            rezult: [
-                [30, 'Есть задатки, нужно развиваться'],
-                [60, 'Очень хорошо, но есть пробелы'],
-                [100, 'Отличный результат'],
-            ],
-            list: [
-                {
-                    type: 'radio',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'неПравильный1', 'неправильный', 'неправильный'],                    
-                },
-                {
-                    type: 'radio',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'неПравильный1', 'неправильный', 'неправильный'],                    
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'неправильный', 'неправильный'],
-                    correct: 2,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'неправильный', 'неправильный'],
-                    correct: 2,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'Правильный1', 'правильный', 'неправильный'],
-                    correct: 3,
-                },
-                {
-                    type: 'checkbox',
-                    question: 'Вопос',
-                    answers: ['Правильный1', 'неПравильный1', 'неправильный', 'неправильный'],
-                    correct: 1,
-                },                
-            ]
-        }
-    ];
-
-    return dataBase;
+    return fetch('./../db/quiz_db.json')
+            .then(response => response.json());
 };
 
-const hideElem = elem => {
+const showElem = (elem) => {
+    let opacity = 0;
+    elem.opacity = 0;
+    elem.style.display = '';
+
+    const animation = () => {
+        opacity += 0.05; 
+        elem.style.opacity = opacity;
+        
+        if(opacity < 1) {
+            requestAnimationFrame(animation);
+        }
+    };
+
+    requestAnimationFrame(animation);
+};
+
+const hideElem = (elem, cb) => {
     let opacity = getComputedStyle(elem).getPropertyValue('opacity'); // получаем свойства
     
     const animation = () => {
@@ -119,34 +37,80 @@ const hideElem = elem => {
             requestAnimationFrame(animation);
         } else {
             elem.style.display = 'none';
+            if (cb) cb();
         }
     };
 
     requestAnimationFrame(animation);
 };
 
-const renderTheme = (themes) => {
+const shuffle = array => {
+    const newArray = [...array];
+    for(let i = 0; i < newArray.length; i++){
+        let j = Math.floor(Math.random() * (i + 1));
 
-    // console.log(themes);
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+
+    return newArray;
+};
+
+const saveResult = (result, id) => {
+    localStorage.setItem(id, result);
+};
+
+const loadResult = id => localStorage.getItem(id);
+
+const renderTheme = (themes) => {
 
     const list = document.querySelector('.selection__list');
     list.textContent = '';
 
-    themes.forEach((themes) => {
-        list.innerHTML += `
-            <li class="selection__item">
-                <button class="selection__theme" data-id="${themes.id}">${themes.theme}</button>
-            </li>
-        `;
+    themes.forEach((themes, i) => {
+        const result = loadResult(themes.id);        
+
+        if (result) {
+            list.innerHTML += `
+                <li class="selection__item">
+                    <button class="selection__theme" data-id="${themes.id}">${themes.theme}</button>
+                    <p class="selection__rezult">
+                        <span class="selection__rezult-ratio">${result}/${themes.list.length}</span>
+                        <span class="selection__rezult-text">Последний результат</span>
+                    </p>
+                </li>
+            `;
+        } else {
+            list.innerHTML += `
+                <li class="selection__item">
+                    <button class="selection__theme" data-id="${themes.id}">${themes.theme}</button>
+                </li>
+            `;
+        }
+        
     });
     
     return document.querySelectorAll('.selection__theme');
 };
 
-const createAnswer = data => {
-    const type = data.type;
+const createKeyAnswers = data => {
+    const keys = [];
 
-    return data.answers.map(item => {
+    for (let i = 0; i < data.answers.length; i++) {
+        if(data.type === 'radio') {
+            keys.push([data.answers[i], !i]);
+        } else {
+            keys.push([data.answers[i], i < data.correct]);
+        }
+    }
+
+    return shuffle(keys);
+};
+
+const createAnswer = data => {
+    const type = data.type,
+        answers = createKeyAnswers(data);
+
+    const labels = answers.map((item, i) => {
         const label = document.createElement('label'),
             input = document.createElement('input');
         
@@ -154,12 +118,58 @@ const createAnswer = data => {
             input.type = type;
             input.name = 'answer';
             input.className = `answer__${type}`;
-
-        const text = document.createTextNode(item);
+            input.value = i;
+        const text = document.createTextNode(item[0]);
 
         label.append(input, text);
 
         return label;
+    });
+
+    const keys = answers.map(answer => answer[1]);
+
+    return {
+        labels,
+        keys
+    };
+};
+
+const showResult = (result, quiz) => {
+    const block = document.createElement('div');
+    block.className = 'main__box main__box_result result';
+
+    const percent = result / quiz.list.length * 100;
+
+    let ratio = 0;
+    
+    for (let i = 0; i < quiz.result.length; i++) {
+
+        if(percent >= quiz.result[i][0]) {
+            ratio = i;
+        }
+    }
+
+    block.innerHTML = `
+        <h2 class="main__subtitle main__subtitle_result">Ваш результат</h2>
+
+        <div class="result__box">
+            <p class="result__ratio result__ratio_${ratio + 1}">${result}/${quiz.list.length}</p>
+            <p class="result__text" >${quiz.result[ratio][1]}</p>
+        </div>        
+    `;
+    const button = document.createElement('button');
+    button.className = 'main__btn result__return';
+    button.textContent = 'К списку квизов';
+    block.append(button);
+
+    main.append(block);
+
+    button.addEventListener('click', () => {
+        hideElem(block, () => {
+            showElem(title);
+            showElem(selection);
+            initQuiz(); 
+        });
     });
 };
 
@@ -172,7 +182,8 @@ const renderQuiz = quiz => {
 
     main.append(questionBox);
 
-    let questionCount = 0;
+    let questionCount = 0,
+        result = 0;
 
     const showQuestion = () => {
         const data = quiz.list[questionCount];
@@ -189,31 +200,50 @@ const renderQuiz = quiz => {
             legend.className = 'main__subtitle';
             legend.textContent = data.question;
             
-        const answers = createAnswer(data);            
+        const answersData = createAnswer(data);            
 
         const button = document.createElement('button');
         button.className = 'main__btn question__next';
         button.type = 'submit';
         button.textContent = 'Подтвердить';
             
-        fieldset.append(legend, ...answers);           
+        fieldset.append(legend, ...answersData.labels);           
 
         form.append(fieldset, button);
 
         questionBox.append(form);
 
         form.addEventListener('submit', event => {
-            event.preventDefault();
-            
+            event.preventDefault();            
             let ok = false;
-
             const answer = [...form.answer].map(input => {
 
                 if(input.checked) ok = true;
 
                 return input.checked ? input.value : false;
             });
-            console.log(answer);
+
+            if(ok) {
+                
+                if (answer.every((result, i) => !!result === answersData.keys[i])) {
+                    result += 1;
+                }
+
+                if (questionCount < quiz.list.length) {
+                    showQuestion();
+                } else {
+                    hideElem(questionBox);
+                    showResult(result, quiz);
+                    saveResult(result, quiz.id);
+                }
+                
+            } else {
+                form.classList.add('main__form-question_error');
+                setTimeout(() => {
+                    form.classList.remove('main__form-question_error');
+                }, 1000);
+            }
+            
             
         });
     };
@@ -235,9 +265,9 @@ const addClick = (buttons, data) => {
 
 };
 
-const initQuiz = () => {
+const initQuiz = async () => {
 
-    const data = getData();
+    const data = await getData();    
 
     const buttons = renderTheme(data);
 
