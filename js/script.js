@@ -5,7 +5,7 @@ const main = document.querySelector('.main'),
     title = document.querySelector('.main__title');
 
 const getData = () => {
-    return fetch('./../db/quiz_db.json')
+    return fetch('db/quiz_db.json')
             .then(response => response.json());
 };
 
